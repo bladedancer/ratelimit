@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/envoyproxy/ratelimit/src/metrics"
-	"github.com/envoyproxy/ratelimit/src/stats"
-	"github.com/envoyproxy/ratelimit/src/trace"
+	"github.com/bladedancer/ratelimit/src/metrics"
+	"github.com/bladedancer/ratelimit/src/stats"
+	"github.com/bladedancer/ratelimit/src/trace"
 
 	gostats "github.com/lyft/gostats"
 
@@ -21,14 +21,14 @@ import (
 
 	logger "github.com/sirupsen/logrus"
 
-	"github.com/envoyproxy/ratelimit/src/config"
-	"github.com/envoyproxy/ratelimit/src/limiter"
-	"github.com/envoyproxy/ratelimit/src/memcached"
-	"github.com/envoyproxy/ratelimit/src/redis"
-	"github.com/envoyproxy/ratelimit/src/server"
-	ratelimit "github.com/envoyproxy/ratelimit/src/service"
-	"github.com/envoyproxy/ratelimit/src/settings"
-	"github.com/envoyproxy/ratelimit/src/utils"
+	"github.com/bladedancer/ratelimit/src/config"
+	"github.com/bladedancer/ratelimit/src/limiter"
+	"github.com/bladedancer/ratelimit/src/memcached"
+	"github.com/bladedancer/ratelimit/src/redis"
+	"github.com/bladedancer/ratelimit/src/server"
+	ratelimit "github.com/bladedancer/ratelimit/src/service"
+	"github.com/bladedancer/ratelimit/src/settings"
+	"github.com/bladedancer/ratelimit/src/utils"
 )
 
 type Runner struct {
@@ -121,7 +121,6 @@ func (runner *Runner) Run() {
 		createLimiter(srv, s, localCache, runner.statsManager),
 		config.NewRateLimitConfigLoaderImpl(),
 		runner.statsManager,
-		s.RuntimeWatchRoot,
 		utils.NewTimeSourceImpl(),
 		s.GlobalShadowMode,
 	)

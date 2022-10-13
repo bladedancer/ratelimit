@@ -10,7 +10,7 @@ import (
 	"golang.org/x/net/context"
 	"gopkg.in/yaml.v2"
 
-	"github.com/envoyproxy/ratelimit/src/stats"
+	"github.com/bladedancer/ratelimit/src/stats"
 )
 
 type yamlReplaces struct {
@@ -292,6 +292,12 @@ func (this *rateLimitConfigImpl) GetLimit(
 	if value == nil {
 		logger.Debugf("unknown domain '%s'", domain)
 		return rateLimit
+	}
+
+	if descriptor.GetLimit() == nil {
+		logger.Debugf("NO LIMIT: %+v", descriptor)
+	} else {
+		logger.Debugf("HAS LIMIT: %+v", descriptor)
 	}
 
 	if descriptor.GetLimit() != nil {

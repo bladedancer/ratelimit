@@ -4,7 +4,7 @@ import (
 	gostats "github.com/lyft/gostats"
 	logger "github.com/sirupsen/logrus"
 
-	"github.com/envoyproxy/ratelimit/src/settings"
+	"github.com/bladedancer/ratelimit/src/settings"
 )
 
 func NewStatManager(store gostats.Store, settings settings.Settings) *ManagerImpl {

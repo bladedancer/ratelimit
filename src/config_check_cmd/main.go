@@ -7,12 +7,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/envoyproxy/ratelimit/src/settings"
-	"github.com/envoyproxy/ratelimit/src/stats"
+	"github.com/bladedancer/ratelimit/src/settings"
+	"github.com/bladedancer/ratelimit/src/stats"
 
 	gostats "github.com/lyft/gostats"
 
-	"github.com/envoyproxy/ratelimit/src/config"
+	"github.com/bladedancer/ratelimit/src/config"
 )
 
 func loadConfigs(allConfigs []config.RateLimitConfigToLoad, mergeDomainConfigs bool) {

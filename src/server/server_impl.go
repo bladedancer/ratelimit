@@ -11,7 +11,6 @@ import (
 	"net/http/pprof"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"sync"
@@ -20,22 +19,21 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/keepalive"
 
-	"github.com/envoyproxy/ratelimit/src/stats"
+	"github.com/bladedancer/ratelimit/src/stats"
 
 	"github.com/coocood/freecache"
 	pb "github.com/envoyproxy/go-control-plane/envoy/service/ratelimit/v3"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/gorilla/mux"
 	reuseport "github.com/kavu/go_reuseport"
-	"github.com/lyft/goruntime/loader"
 	gostats "github.com/lyft/gostats"
 	logger "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 
-	"github.com/envoyproxy/ratelimit/src/limiter"
-	"github.com/envoyproxy/ratelimit/src/settings"
+	"github.com/bladedancer/ratelimit/src/limiter"
+	"github.com/bladedancer/ratelimit/src/settings"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel"
@@ -52,14 +50,14 @@ type serverDebugListener struct {
 }
 
 type server struct {
-	httpAddress   string
-	grpcAddress   string
-	debugAddress  string
-	router        *mux.Router
-	grpcServer    *grpc.Server
-	store         gostats.Store
-	scope         gostats.Scope
-	runtime       loader.IFace
+	httpAddress  string
+	grpcAddress  string
+	debugAddress string
+	router       *mux.Router
+	grpcServer   *grpc.Server
+	store        gostats.Store
+	scope        gostats.Scope
+	//	runtime       loader.IFace
 	debugListener serverDebugListener
 	httpServer    *http.Server
 	listenerMu    sync.Mutex
@@ -184,9 +182,9 @@ func (server *server) Scope() gostats.Scope {
 	return server.scope
 }
 
-func (server *server) Runtime() loader.IFace {
-	return server.runtime
-}
+// func (server *server) Runtime() loader.IFace {
+// 	return server.runtime
+// }
 
 func NewServer(s settings.Settings, name string, statsManager stats.Manager, localCache *freecache.Cache, opts ...settings.Option) Server {
 	return newServer(s, name, statsManager, localCache, opts...)
@@ -235,36 +233,38 @@ func newServer(s settings.Settings, name string, statsManager stats.Manager, loc
 	}
 
 	// setup runtime
-	loaderOpts := make([]loader.Option, 0, 1)
-	if s.RuntimeIgnoreDotFiles {
-		loaderOpts = append(loaderOpts, loader.IgnoreDotFiles)
-	} else {
-		loaderOpts = append(loaderOpts, loader.AllowDotFiles)
-	}
-	var err error
-	if s.RuntimeWatchRoot {
-		ret.runtime, err = loader.New2(
-			s.RuntimePath,
-			s.RuntimeSubdirectory,
-			ret.store.ScopeWithTags("runtime", s.ExtraTags),
-			&loader.SymlinkRefresher{RuntimePath: s.RuntimePath},
-			loaderOpts...)
-	} else {
-		directoryRefresher := &loader.DirectoryRefresher{}
-		// Adding loader.Remove to the default set of goruntime's FileSystemOps.
-		directoryRefresher.WatchFileSystemOps(loader.Remove, loader.Write, loader.Create, loader.Chmod)
+	// loaderOpts := make([]loader.Option, 0, 1)
+	// if s.RuntimeIgnoreDotFiles {
+	// 	loaderOpts = append(loaderOpts, loader.IgnoreDotFiles)
+	// } else {
+	// 	loaderOpts = append(loaderOpts, loader.AllowDotFiles)
+	// }
+	// var err error
+	// if s.RuntimeWatchRoot {
+	// 	ret.runtime, err = loader.New2(
+	// 		s.RuntimePath,
+	// 		s.RuntimeSubdirectory,
+	// 		ret.store.ScopeWithTags("runtime", s.ExtraTags),
+	// 		&loader.SymlinkRefresher{RuntimePath: s.RuntimePath},
+	// 		loaderOpts...)
+	// } else {
+	// 	directoryRefresher := &loader.DirectoryRefresher{}
+	// 	// Adding loader.Remove to the default set of goruntime's FileSystemOps.
+	// 	directoryRefresher.WatchFileSystemOps(loader.Remove, loader.Write, loader.Create, loader.Chmod)
 
-		ret.runtime, err = loader.New2(
-			filepath.Join(s.RuntimePath, s.RuntimeSubdirectory),
-			"config",
-			ret.store.ScopeWithTags("runtime", s.ExtraTags),
-			directoryRefresher,
-			loaderOpts...)
-	}
+	// 	ret.runtime, err = loader.New2(
+	// 		filepath.Join(s.RuntimePath, s.RuntimeSubdirectory),
+	// 		"config",
+	// 		ret.store.ScopeWithTags("runtime", s.ExtraTags),
+	// 		directoryRefresher,
+	// 		loaderOpts...)
+	// }
 
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// TODO: register ratelimit server.
 
 	// setup http router
 	ret.router = mux.NewRouter()

@@ -7,7 +7,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 	"google.golang.org/grpc"
 
-	"github.com/envoyproxy/ratelimit/src/utils"
+	"github.com/bladedancer/ratelimit/src/utils"
 )
 
 type Settings struct {
@@ -53,10 +53,12 @@ type Settings struct {
 	ExtraTags  map[string]string `envconfig:"EXTRA_TAGS" default:""`
 
 	// Settings for rate limit configuration
-	RuntimePath           string `envconfig:"RUNTIME_ROOT" default:"/srv/runtime_data/current"`
-	RuntimeSubdirectory   string `envconfig:"RUNTIME_SUBDIRECTORY"`
-	RuntimeIgnoreDotFiles bool   `envconfig:"RUNTIME_IGNOREDOTFILES" default:"false"`
-	RuntimeWatchRoot      bool   `envconfig:"RUNTIME_WATCH_ROOT" default:"true"`
+	// RuntimePath           string `envconfig:"RUNTIME_ROOT" default:"/srv/runtime_data/current"`
+	// RuntimeSubdirectory   string `envconfig:"RUNTIME_SUBDIRECTORY"`
+	// RuntimeIgnoreDotFiles bool   `envconfig:"RUNTIME_IGNOREDOTFILES" default:"false"`
+	// RuntimeWatchRoot      bool   `envconfig:"RUNTIME_WATCH_ROOT" default:"true"`
+	RuntimeConfigHost string `envconfig:"RUNTIME_CONFIGURATION_HOST" default:"ampgw-governance-agent"`
+	RuntimeConfigPort int    `envconfig:"RUNTIME_CONFIGURATION_HOST" default:"18000"`
 
 	// Settings for all cache types
 	ExpirationJitterMaxSeconds int64   `envconfig:"EXPIRATION_JITTER_MAX_SECONDS" default:"300"`

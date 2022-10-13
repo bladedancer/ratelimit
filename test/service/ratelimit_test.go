@@ -6,9 +6,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/envoyproxy/ratelimit/src/stats"
+	"github.com/bladedancer/ratelimit/src/stats"
 
-	"github.com/envoyproxy/ratelimit/src/utils"
+	"github.com/bladedancer/ratelimit/src/utils"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	pb "github.com/envoyproxy/go-control-plane/envoy/service/ratelimit/v3"
@@ -17,17 +17,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 
-	"github.com/envoyproxy/ratelimit/src/trace"
+	"github.com/bladedancer/ratelimit/src/trace"
 
-	"github.com/envoyproxy/ratelimit/src/config"
-	"github.com/envoyproxy/ratelimit/src/redis"
-	ratelimit "github.com/envoyproxy/ratelimit/src/service"
-	"github.com/envoyproxy/ratelimit/test/common"
-	mock_config "github.com/envoyproxy/ratelimit/test/mocks/config"
-	mock_limiter "github.com/envoyproxy/ratelimit/test/mocks/limiter"
-	mock_loader "github.com/envoyproxy/ratelimit/test/mocks/runtime/loader"
-	mock_snapshot "github.com/envoyproxy/ratelimit/test/mocks/runtime/snapshot"
-	mock_stats "github.com/envoyproxy/ratelimit/test/mocks/stats"
+	"github.com/bladedancer/ratelimit/src/config"
+	"github.com/bladedancer/ratelimit/src/redis"
+	ratelimit "github.com/bladedancer/ratelimit/src/service"
+	"github.com/bladedancer/ratelimit/test/common"
+	mock_config "github.com/bladedancer/ratelimit/test/mocks/config"
+	mock_limiter "github.com/bladedancer/ratelimit/test/mocks/limiter"
+	mock_loader "github.com/bladedancer/ratelimit/test/mocks/runtime/loader"
+	mock_snapshot "github.com/bladedancer/ratelimit/test/mocks/runtime/snapshot"
+	mock_stats "github.com/bladedancer/ratelimit/test/mocks/stats"
 )
 
 type barrier struct {
@@ -106,7 +106,7 @@ func (this *rateLimitServiceTestSuite) setupBasicService() ratelimit.RateLimitSe
 	// reset exporter before using
 	testSpanExporter.Reset()
 
-	return ratelimit.NewService(this.runtime, this.cache, this.configLoader, this.statsManager, true, MockClock{now: int64(2222)}, false)
+	return ratelimit.NewService(this.runtime, this.cache, this.configLoader, this.statsManager, MockClock{now: int64(2222)}, false)
 }
 
 // once a ratelimit service is initiated, the package always fetches a default tracer from otel runtime and it can't be change until a new round of test is run. It is necessary to keep a package level exporter in this test package in order to correctly run the tests.
@@ -505,7 +505,7 @@ func TestInitialLoadError(test *testing.T) {
 		func([]config.RateLimitConfigToLoad, stats.Manager, bool) {
 			panic(config.RateLimitConfigError("load error"))
 		})
-	service := ratelimit.NewService(t.runtime, t.cache, t.configLoader, t.statsManager, true, t.mockClock, false)
+	service := ratelimit.NewService(t.runtime, t.cache, t.configLoader, t.statsManager, t.mockClock, false)
 
 	request := common.NewRateLimitRequest("test-domain", [][][2]string{{{"hello", "world"}}}, 1)
 	response, err := service.ShouldRateLimit(context.Background(), request)

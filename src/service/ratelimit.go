@@ -11,10 +11,10 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 
-	"github.com/envoyproxy/ratelimit/src/settings"
-	"github.com/envoyproxy/ratelimit/src/stats"
+	"github.com/bladedancer/ratelimit/src/settings"
+	"github.com/bladedancer/ratelimit/src/stats"
 
-	"github.com/envoyproxy/ratelimit/src/utils"
+	"github.com/bladedancer/ratelimit/src/utils"
 
 	core "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	pb "github.com/envoyproxy/go-control-plane/envoy/service/ratelimit/v3"
@@ -22,10 +22,10 @@ import (
 	logger "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 
-	"github.com/envoyproxy/ratelimit/src/assert"
-	"github.com/envoyproxy/ratelimit/src/config"
-	"github.com/envoyproxy/ratelimit/src/limiter"
-	"github.com/envoyproxy/ratelimit/src/redis"
+	"github.com/bladedancer/ratelimit/src/assert"
+	"github.com/bladedancer/ratelimit/src/config"
+	"github.com/bladedancer/ratelimit/src/limiter"
+	"github.com/bladedancer/ratelimit/src/redis"
 )
 
 var tracer = otel.Tracer("ratelimit")
@@ -43,7 +43,6 @@ type service struct {
 	runtimeUpdateEvent          chan int
 	cache                       limiter.RateLimitCache
 	stats                       stats.ServiceStats
-	runtimeWatchRoot            bool
 	customHeadersEnabled        bool
 	customHeaderLimitHeader     string
 	customHeaderRemainingHeader string
@@ -68,15 +67,16 @@ func (this *service) reloadConfig(statsManager stats.Manager) {
 	files := []config.RateLimitConfigToLoad{}
 	snapshot := this.runtime.Snapshot()
 	for _, key := range snapshot.Keys() {
-		if this.runtimeWatchRoot && !strings.HasPrefix(key, "config.") {
-			continue
-		}
+		// if this.runtimeWatchRoot && !strings.HasPrefix(key, "config.") {
+		// 	continue
+		// }
 
 		files = append(files, config.RateLimitConfigToLoad{key, snapshot.Get(key)})
 	}
 
 	rlSettings := settings.NewSettings()
-	newConfig := this.configLoader.Load(files, statsManager, rlSettings.MergeDomainConfigurations)
+	newConfig := &config.RateLimitConfig{}
+	//newConfig := this.configLoader.Load(files, statsManager, rlSettings.MergeDomainConfigurations)
 	this.stats.ConfigLoadSuccess.Inc()
 
 	this.configLock.Lock()
@@ -313,7 +313,7 @@ func (this *service) GetCurrentConfig() config.RateLimitConfig {
 }
 
 func NewService(runtime loader.IFace, cache limiter.RateLimitCache,
-	configLoader config.RateLimitConfigLoader, statsManager stats.Manager, runtimeWatchRoot bool, clock utils.TimeSource, shadowMode bool) RateLimitServiceServer {
+	configLoader config.RateLimitConfigLoader, statsManager stats.Manager, clock utils.TimeSource, shadowMode bool) RateLimitServiceServer {
 
 	newService := &service{
 		runtime:            runtime,
@@ -323,7 +323,6 @@ func NewService(runtime loader.IFace, cache limiter.RateLimitCache,
 		runtimeUpdateEvent: make(chan int),
 		cache:              cache,
 		stats:              statsManager.NewServiceStats(),
-		runtimeWatchRoot:   runtimeWatchRoot,
 		globalShadowMode:   shadowMode,
 		customHeaderClock:  clock,
 	}
